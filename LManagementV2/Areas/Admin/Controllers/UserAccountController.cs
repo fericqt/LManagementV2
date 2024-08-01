@@ -8,8 +8,7 @@ namespace LManagementV2.Areas.Admin.Controllers {
 
         private readonly IUnitOfWork _unitOfWork;
 
-        public UserAccountController(IUnitOfWork unitOfWork)
-        {
+        public UserAccountController(IUnitOfWork unitOfWork) {
             _unitOfWork = unitOfWork;
         }
 
@@ -25,7 +24,7 @@ namespace LManagementV2.Areas.Admin.Controllers {
         [HttpPost]
         [ActionName("Register")]
         public IActionResult RegisterPOST(User user) {
-            if (user == null) { 
+            if (user == null) {
                 return View();
             }
             user.Roles = "Admin";
@@ -34,8 +33,23 @@ namespace LManagementV2.Areas.Admin.Controllers {
             _unitOfWork.Save();
 
             TempData["success"] = "Account Created Successfully!";
+            return RedirectToAction(nameof(Login));
+        }
+        [HttpPost]
+        [ActionName(nameof(Login))]
+        public IActionResult LoginPOST(User user) {
+            if (user == null) { 
+                return View(); 
+            }
 
-            return RedirectToAction(nameof(Register));
+            var tempData = _unitOfWork.UserRepo.GetBy(c=>c.Username == user.Username && c.Password == user.Password);
+            if (tempData == null) {
+                TempData["error"] = "Username or Password is incorrect!";
+                return RedirectToAction(nameof(Login));
+            }
+
+            TempData["success"] = "Credentials Verified";
+            return RedirectToAction(nameof(Login));
         }
     }
 }
