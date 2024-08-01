@@ -32,7 +32,10 @@ namespace LManagementV2.Areas.Admin.Controllers {
             user.Created = DateTime.Now;
             _unitOfWork.UserRepo.AddToDatabase(user);
             _unitOfWork.Save();
-            return View();
+
+            TempData["success"] = "Account Created Successfully!";
+
+            return RedirectToAction(nameof(Register));
         }
     }
 }
