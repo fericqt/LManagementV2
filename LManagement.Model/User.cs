@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,10 @@ namespace LManagement.Model {
     public class User {
         [Key]
         public int id { get; set; }
+        [Required]
+        [EmailAddress]
         public string Username { get; set; }
+        [Required]
         public string Password { get; set; }
         public string Roles { get; set; }
 
