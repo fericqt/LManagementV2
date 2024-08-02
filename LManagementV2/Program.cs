@@ -2,6 +2,9 @@ using LManagement.Data.DBContext;
 using LManagement.Data.DBInitializer;
 using LManagement.Data.Repository;
 using LManagement.Data.Repository.IRepository;
+using LManagement.Utility;
+using LManagement.Utility.IUtilities;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +15,16 @@ builder.Services.AddDbContext<LManagementDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(opt => {
+    opt.LoginPath = "/UserAccount/Login";
+});
+builder.Services.AddTransient<IGuid, GuidImplementation>();
+
+
+builder.Services.AddAuthorization(opt => {
+    opt.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+});
+
 
 var app = builder.Build();
 
@@ -32,7 +45,11 @@ SeedDatabase();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{area=Admin}/{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=UserAccount}/{action=Login}/{id?}"
+    
+ );
+
+
 
 app.Run();
 void SeedDatabase() {
